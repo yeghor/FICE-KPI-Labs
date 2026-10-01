@@ -1,0 +1,79 @@
+---
+title: Affray Nofifier Platform
+---
+erDiagram
+    VIDEO_STREAMS {
+        int id PK
+        timestamp created_at
+        int organization_id FK
+        int location_id FK
+        
+        string name
+        string tags
+        boolean active
+
+        %% are used to compute ration, resolution
+        int width
+        int height
+
+    }
+
+    ORGANIZATIONS {
+        int id PK
+        string name
+    }
+
+    LOCATIONS {
+        int id PK
+        string name
+    }
+
+    USERS {
+        int id PK
+        string name
+        string role_id FK
+        string organization_id FK
+    }
+
+    ROLES {
+        int id PK
+        string name
+
+        boolean can_view_streams  
+        boolean can_manage_streams
+        boolean can_view_incidents
+        boolean can_resolve_incident
+    }
+
+    INCIDENT_RECIPIENTS {
+        int id PK
+        int incident_id FK
+        string notification_type
+    }
+
+    INCIDENT_ALERTS {
+        int id PK
+        int video_stream_id FK
+        timestamp issued_at
+    }
+
+    INCIDENTS {
+        int id PK
+        int video_stream_id FK
+        timestamp created_at
+        float confidence
+
+        string? additional_info_url
+        boolean resolved
+        string? comment
+    }
+
+    ROLES ||--o{ USERS : temp_desc
+    ORGANIZATIONS ||--o{ USERS : temp_desc
+
+    VIDEO_STREAMS }o--|| LOCATIONS : temp_desc
+    VIDEO_STREAMS }o--|| ORGANIZATIONS : temp_desc
+    VIDEO_STREAMS }|--o{ INCIDENTS : temp_desc
+    VIDEO_STREAMS |o--o{ INCIDENT_RECIPIENTS : temp_desc
+    
+    INCIDENT_RECIPIENTS }o--o{ INCIDENT_ALERTS : temp_desc
