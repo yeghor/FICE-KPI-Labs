@@ -68,12 +68,12 @@ erDiagram
         string? comment
     }
 
-    ROLES ||--o{ USERS : temp_desc
-    ORGANIZATIONS ||--o{ USERS : temp_desc
+    ROLES ||--o{ USERS : has
+    ORGANIZATIONS ||--o{ USERS : belongs_to
 
-    VIDEO_STREAMS }o--|| LOCATIONS : temp_desc
-    VIDEO_STREAMS }o--|| ORGANIZATIONS : temp_desc
-    VIDEO_STREAMS }|--o{ INCIDENTS : temp_desc
-    VIDEO_STREAMS |o--o{ INCIDENT_RECIPIENTS : temp_desc
+    VIDEO_STREAMS }o--|| LOCATIONS : belongs_to
+    VIDEO_STREAMS }o--|| ORGANIZATIONS : belongs_to
+    VIDEO_STREAMS }|--o{ INCIDENTS : generates
+    VIDEO_STREAMS |o--o{ INCIDENT_RECIPIENTS : has
     
-    INCIDENT_RECIPIENTS }o--o{ INCIDENT_ALERTS : temp_desc
+    INCIDENT_RECIPIENTS }o--o{ INCIDENT_ALERTS : belongs_to
