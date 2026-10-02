@@ -86,7 +86,15 @@ limits visibility; those details require confirmation.
 ### 4.4 Incident notifications
 
 - The model includes incident-recipient records with a notification type and
-  incident-alert records with an issue timestamp and associated video stream.
+  an optional latency priority, and incident-alert records with an issue
+  timestamp and associated video stream.
+- The platform must support a latency priority for each incident recipient.
+  When no priority is specified, the recipient must be treated as having the
+  highest priority.
+- Notification processing must honor recipients' effective priorities when
+  scheduling or delivering incident notifications. The priority scale and
+  numeric ordering are not defined by the model and must be agreed before
+  implementation.
 - The platform must preserve these notification-related records if this
   functionality is implemented.
 - Delivery behavior, recipient identity or address, supported notification
@@ -104,7 +112,7 @@ limits visibility; those details require confirmation.
 | `ROLES` | `id` (primary key), `name`, `can_view_streams`, `can_manage_streams`, `can_view_incidents`, `can_resolve_incident` |
 | `VIDEO_STREAMS` | `id` (primary key), `created_at`, `organization_id` (foreign key), `location_id` (foreign key), `name`, `tags`, `active`, `width`, `height` |
 | `INCIDENTS` | `id` (primary key), `video_stream_id` (foreign key), `created_at`, `confidence`, optional `additional_info_url`, `resolved`, optional `comment` |
-| `INCIDENT_RECIPIENTS` | `id` (primary key), `incident_id` (foreign key), `notification_type` |
+| `INCIDENT_RECIPIENTS` | `id` (primary key), `incident_id` (foreign key), `notification_type`, optional `latency_priority` (integer; defaults to highest priority when unspecified) |
 | `INCIDENT_ALERTS` | `id` (primary key), `video_stream_id` (foreign key), `issued_at` |
 
 The model marks identifiers as primary keys and identifies the stated foreign
@@ -115,8 +123,9 @@ database types and precision.
 ## 6. Operational qualities
 
 - **Timeliness:** Detection and alerting are intended to happen within seconds
-  of an incident. The precise latency target and measurement boundary must be
-  agreed.
+  of an incident. Recipient latency priorities determine notification
+  processing order; an unspecified priority is treated as the highest. The
+  precise latency target and measurement boundary must be agreed.
 - **Detection quality:** The detector must use temporal evidence to reduce
   false positives from benign interactions that resemble violence in a single
   frame. Accuracy targets and evaluation datasets are not specified.
@@ -147,6 +156,7 @@ separate requirements.
    the singular `role_id` suggests, and whether organization boundaries scope
    access to streams and incidents.
 5. **Detection and notification policy:** Define the incident confidence
-   threshold, alert timing, notification types and delivery guarantees.
+   threshold, alert timing, notification types and delivery guarantees, and the
+   latency-priority scale and its numeric ordering.
 6. **Required values and constraints:** Define constraints for names, tags,
    stream dimensions, timestamps, confidence range, and unique records.
