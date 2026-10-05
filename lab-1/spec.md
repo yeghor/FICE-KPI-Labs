@@ -72,16 +72,21 @@ limits visibility; those details require confirmation.
   computer-vision model.
 - Each recorded incident must include a unique identifier, associated stream,
   creation timestamp, confidence score, and resolved status.
-- An incident may include an additional-information URL and a comment; both
-  are optional.
+- An incident may include an additional-information URL, a comment, and an
+  optional `false_positive` flag to record whether the alert was later judged
+  to be a false positive for the purpose of evaluating DNN detection
+  performance.
 - Detection confidence must be represented as a numeric value. The acceptable
   range, threshold for creating an incident, and calibration policy are not
   specified and must be agreed before implementation.
 - Newly detected incidents must initially be unresolved.
 - Users with `can_view_incidents` may view incidents. Users with
   `can_resolve_incident` may resolve incidents and provide a comment.
-- The incident model contains no explicit resolution timestamp, resolving user,
-  or incident status beyond the resolved boolean.
+- When an incident is resolved, the platform must record the resolution
+  timestamp and the user who performed the resolution.
+- Newly detected, unresolved incidents must have no resolution timestamp or
+  resolving user. These fields are required when an incident is resolved.
+- `resolved_by_user_id` must reference the user who performed the resolution.
 
 ### 4.4 Incident notifications
 
@@ -111,14 +116,18 @@ limits visibility; those details require confirmation.
 | `USERS` | `id` (primary key), `name`, `role_id` (foreign key), `organization_id` (foreign key) |
 | `ROLES` | `id` (primary key), `name`, `can_view_streams`, `can_manage_streams`, `can_view_incidents`, `can_resolve_incident` |
 | `VIDEO_STREAMS` | `id` (primary key), `created_at`, `organization_id` (foreign key), `location_id` (foreign key), `name`, `tags`, `active`, `width`, `height` |
-| `INCIDENTS` | `id` (primary key), `video_stream_id` (foreign key), `created_at`, `confidence`, optional `additional_info_url`, `resolved`, optional `comment` |
+| `INCIDENTS` | `id` (primary key), `video_stream_id` (foreign key), `created_at`, `confidence`, optional `additional_info_url`, `resolved`, optional `false_positive`, `resolved_at`, `resolved_by_user_id` (foreign key to `USERS`), optional `comment` |
 | `INCIDENT_RECIPIENTS` | `id` (primary key), `incident_id` (foreign key), `notification_type`, optional `latency_priority` (integer; defaults to highest priority when unspecified) |
 | `INCIDENT_ALERTS` | `id` (primary key), `video_stream_id` (foreign key), `issued_at` |
 
 The model marks identifiers as primary keys and identifies the stated foreign
-keys. It does not define nullability beyond the optional incident URL and
-comment, uniqueness constraints, deletion behavior, indexes, or concrete
-database types and precision.
+keys. It does not define nullability beyond the optional incident URL, comment,
+and `false_positive` evaluation flag, uniqueness constraints, deletion behavior,
+indexes, or concrete database types and precision.
+
+Note: `false_positive` is intended as a model-evaluation flag to support DNN
+performance analysis and should be interpreted as a post-review quality metric,
+not as a substitute for the operational `resolved` state.
 
 ## 6. Operational qualities
 
@@ -130,7 +139,8 @@ database types and precision.
   false positives from benign interactions that resemble violence in a single
   frame. Accuracy targets and evaluation datasets are not specified.
 - **Traceability:** Incidents must retain their stream association, creation
-  time, confidence, resolution state, and any supplied comment or reference URL.
+  time, confidence, resolution state, resolver and resolution time, and any
+  supplied comment or reference URL.
 - **Authorization:** Each operation must be restricted by the relevant role
   permission.
 
@@ -160,3 +170,6 @@ separate requirements.
    latency-priority scale and its numeric ordering.
 6. **Required values and constraints:** Define constraints for names, tags,
    stream dimensions, timestamps, confidence range, and unique records.
+7. **Resolution audit constraints:** The model includes `resolved_at` and
+   `resolved_by_user_id`; define and enforce their nullability so both are
+   absent while unresolved and populated when resolved.

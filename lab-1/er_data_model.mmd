@@ -65,7 +65,11 @@ erDiagram
         float confidence
 
         string? additional_info_url
+
         boolean resolved
+        boolean false_positive
+        timestamp? resolved_at
+        int? resolved_by_user_id FK
         string? comment
     }
 
