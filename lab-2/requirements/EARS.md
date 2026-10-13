@@ -11,10 +11,9 @@
 | REQ-01 | Unwanted Behavior | **IF** the Data-stream runner stops to process queues | The system **SHALL** perform safe-exit to allow ArgoCD reboot the pod |
 | REQ-02 | Unwanted Behavior  | **IF** dead data-streams are noticed | The system **SHALL** mark the data-streams as degraded and stop processing them until the streams'll be restarted manually or by another worker |
 | REQ-03 | Event-Driven | **WHEN** the user tries to retrieve analyze of incidents in a specific date range | The system **SHALL** return readable and visualy appealing representation of `Incidents` of a chosen source |
-| REQ-04 | Event-Driven | **WHEN** the user tries to view `Incidents` | The system **SHALL** return readable representation of latest `Incidents` ordered by `confidence` |
-| REQ-05 | Event-Driven  | **WHEN** the user tries to create records of DNN model metrics | The system **SHALL** create records in corresponding database table with initial status |
-| REQ-06 | Event-Driven  | **WHEN** the user tries to fine-tune the DNN model via stored evaluation metrics table | The system **SHALL** start runner to feed new stored training instances with a correct label |
-| REQ-07 | Ubiquitous  | | The system **SHALL** restrict external access (from outside the organization) to the data the organization owns|
+| REQ-04 | Event-Driven  | **WHEN** the user tries to create records of DNN model metrics | The system **SHALL** create records in corresponding database table with initial status |
+| REQ-05 | Event-Driven  | **WHEN** the user tries to fine-tune the DNN model via stored evaluation metrics table | The system **SHALL** start runner to feed new stored training instances with a correct label |
+| REQ-06 | Ubiquitous  | | The system **SHALL** restrict external access (from outside the organization) to the data the organization owns|
 
 ### Datamodel Changes Required
 
