@@ -84,7 +84,7 @@ These stories are derived from the requirements in [EARS.md](./EARS.md). Each st
 - **Given** an evaluation record has a `metric` value, **when** that value is stored, **then** it is one of `FP`, `TP`, `TN`, or `FN`.
 - **Given** an evaluation record has no applicable confusion-matrix metric, **when** it is stored, **then** its `metric` field may be null.
 - **Given** I request fine-tuning using stored evaluation metrics, **when** the system processes the request, **then** it starts a runner.
-Given a record’s metric is null, when the runner selects training instances, then it excludes that record unless its label can be determined from another source.
+- **Given** a record’s metric is null, **when** the runner selects training instances, **then** it excludes that record unless its label can be determined from another source.
 
 ## US-07 Keep organization data private
 
