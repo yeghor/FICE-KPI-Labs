@@ -19,4 +19,4 @@
 ### Datamodel Changes Required
 
 - `VIDEO_STREAMS` - new field `degraded BOOLEAN DEFAULT False` to distinct degraded entries from active one's
-- New table - `EVALUATION_METRICS_RECORDS` to store useful incident cases reviewed by a user for DNN fine-tunning
+- New table - `EVALUATION_METRICS_RECORDS` to store useful incident cases reviewed by a user for DNN fine-tuning; each record has a `status` (e.g. `reviewed`) and a nullable `metric` whose value is one of `FP`, `TP`, `TN`, or `FN`
