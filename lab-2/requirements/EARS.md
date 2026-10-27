@@ -14,6 +14,7 @@
 | REQ-04 | Event-Driven  | **WHEN** the user tries to create records of DNN model metrics | The system **SHALL** create records in corresponding database table with initial status |
 | REQ-05 | Event-Driven  | **WHEN** the user tries to fine-tune the DNN model via stored evaluation metrics table | The system **SHALL** start runner to feed new stored training instances with a correct label |
 | REQ-06 | Ubiquitous  | | The system **SHALL** restrict external access (from outside the organization) to the data the organization owns|
+| REQ-07 | Event-Driven | **WHEN** the user requests the latest incidents | The system **SHALL** return the latest incidents ordered by confidence |
 
 ### Datamodel Changes Required
 

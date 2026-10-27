@@ -46,7 +46,7 @@ These stories are derived from the requirements in [EARS.md](./EARS.md). Each st
 
 ## US-04 View the latest incidents by confidence
 
-**Related requirement:** REQ-04
+**Related requirement:** REQ-07
 
 **As a** client who belongs to a registered organization,  
 **I want** to view the latest incidents ordered by confidence,  
@@ -59,7 +59,7 @@ These stories are derived from the requirements in [EARS.md](./EARS.md). Each st
 
 ## US-05 Record DNN model metrics
 
-**Related requirement:** REQ-05
+**Related requirement:** REQ-04
 
 **As a** client who submits DNN model metrics,  
 **I want** the system to create a metrics record with its initial status,  
@@ -72,11 +72,11 @@ These stories are derived from the requirements in [EARS.md](./EARS.md). Each st
 
 ## US-06 Record reviewed evaluations for DNN fine-tuning
 
-**Related requirement:** REQ-06; datamodel change: `EVALUATION_METRICS_RECORDS`
+**Related requirement:** REQ-05; datamodel change: `EVALUATION_METRICS_RECORDS`
 
 **As a** client who reviews incident evaluation metrics,  
 **I want** each evaluation record to capture its review status and optional confusion-matrix metric,  
-**Given the runner processes stored training instances, when it feeds an instance to the model, then the instance has the correct label.** reviewed incident cases can be used as correctly labeled training instances.
+**so that** reviewed incident cases can be used as correctly labeled training instances.
 
 **Acceptance criteria**
 
@@ -88,7 +88,7 @@ These stories are derived from the requirements in [EARS.md](./EARS.md). Each st
 
 ## US-07 Keep organization data private
 
-**Related requirement:** REQ-07
+**Related requirement:** REQ-06
 
 **As a** client who belongs to a registered organization,  
 **I want** access to organization-owned data to be restricted to users and interfaces within that organization,  
