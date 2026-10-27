@@ -7,5 +7,5 @@
 | REQ-03 | US-03 | UC-02.1 | **1:1 Connectivity.** Covered. |
 | REQ-04 | US-05 | UC-03.1 | **1:1 Connectivity.** Covered. |
 | REQ-05 | US-06 | UC-03.2 | **1:1 Connectivity.** Covered. |
-| REQ-06 | US-07 | - | **Not Covered.** Organization data privacy has no active BDD scenario yet. |
+| REQ-06 | US-07 | UC-04.1 | **1:1 Connectivity.** Covered. |
 | REQ-07 | US-04 | UC-02.2 | **1:1 Connectivity.** Covered. |

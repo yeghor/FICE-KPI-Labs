@@ -39,10 +39,9 @@ Scenarios based on [EARS.md](./EARS.md) and [User-stories.md](./User-stories.md)
 **Given** reviewed evaluation records are stored with an optional `FP`, `TP`, `TN`, or `FN` metric<br>
 **When** a client requests fine-tuning<br>
 **Then** the system starts a runner that trains only on instances with a determinable, correct label
-<!-- 
-## **Feature: Organization data privacy** -->
+## **Feature 04: Organization data privacy**
 
-<!-- ### **Scenario: Restrict access to organization-owned data** (US-07, REQ-06)
+### **Scenario UC-04.1: Restrict access to organization-owned data** (US-07, REQ-06)
 **Given** data belongs to a registered organization<br>
 **When** a user or interface outside that organization requests it<br>
-**Then** the system denies access -->
+**Then** the system denies access
