@@ -9,7 +9,7 @@ Scenarios based on [EARS.md](./EARS.md) and [User-stories.md](./User-stories.md)
 **When** it stops processing them<br>
 **Then** the system exits safely so ArgoCD can reboot the pod
 
-### **Scenario UC-01.1: Isolate and recover a dead data-stream** (US-02, REQ-02)
+### **Scenario UC-01.2: Isolate and recover a dead data-stream** (US-02, REQ-02)
 **Given** a data-stream is being processed<br>
 **When** it is detected as dead<br>
 **Then** the system marks it as degraded and suspends processing until restart<br>
