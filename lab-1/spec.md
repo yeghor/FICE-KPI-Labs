@@ -86,13 +86,28 @@ limits visibility; those details require confirmation.
   timestamp and the user who performed the resolution.
 - Newly detected, unresolved incidents must have no resolution timestamp or
   resolving user. These fields are required when an incident is resolved.
+- An incident is associated with exactly one video stream; a video stream may
+  have zero or many incidents.
+- An incident may be resolved only by one user with `can_resolve_incident`.
+  Each resolved incident has exactly one resolving user; a user may resolve
+  zero or many incidents. Unresolved incidents have no resolving user.
 - `resolved_by_user_id` must reference the user who performed the resolution.
 
 ### 4.4 Incident notifications
 
 - The model includes incident-recipient records with a notification type and
   an optional latency priority, and incident-alert records with an issue
-  timestamp and associated video stream.
+  timestamp and associated incident.
+- An incident recipient is a user selected to receive notifications about one
+  incident. Each recipient record belongs to exactly one incident and one user;
+  an incident and a user may each have zero or many recipient records.
+- Each alert belongs to exactly one incident, and an incident may have zero or
+  many alerts. The alert's video stream is determined by its incident.
+- Alerts record incident-level notification events, not individual delivery
+  attempts. Each alert is associated with all recipient records for its
+  incident. Therefore alert-to-recipient is conceptually many-to-many through
+  the incident, but is derived rather than stored as a direct relationship;
+  per-recipient delivery attempts are not modeled.
 - The platform must support a latency priority for each incident recipient.
   When no priority is specified, the recipient must be treated as having the
   highest priority.
@@ -102,9 +117,9 @@ limits visibility; those details require confirmation.
   implementation.
 - The platform must preserve these notification-related records if this
   functionality is implemented.
-- Delivery behavior, recipient identity or address, supported notification
-  types, retry policy, and the relationship between an alert, an incident, and
-  its recipients are not sufficiently defined by the model. No delivery
+- Delivery behavior, recipient delivery address, supported notification
+  destinations, retry policy, and delivery guarantees are not defined by the
+  model. A recipient is a user, not a notification endpoint. No delivery
   guarantees are assumed by this specification.
 
 ## 5. Data model
@@ -116,14 +131,16 @@ limits visibility; those details require confirmation.
 | `USERS` | `id` (primary key), `name`, `role_id` (foreign key), `organization_id` (foreign key) |
 | `ROLES` | `id` (primary key), `name`, `can_view_streams`, `can_manage_streams`, `can_view_incidents`, `can_resolve_incident` |
 | `VIDEO_STREAMS` | `id` (primary key), `created_at`, `organization_id` (foreign key), `location_id` (foreign key), `name`, `tags`, `active`, `width`, `height` |
-| `INCIDENTS` | `id` (primary key), `video_stream_id` (foreign key), `created_at`, `confidence`, optional `additional_info_url`, `resolved`, optional `false_positive`, `resolved_at`, `resolved_by_user_id` (foreign key to `USERS`), optional `comment` |
-| `INCIDENT_RECIPIENTS` | `id` (primary key), `incident_id` (foreign key), `notification_type`, optional `latency_priority` (integer; defaults to highest priority when unspecified) |
-| `INCIDENT_ALERTS` | `id` (primary key), `video_stream_id` (foreign key), `issued_at` |
+| `INCIDENTS` | `id` (primary key), `video_stream_id` (foreign key), `created_at`, `confidence`, optional `additional_info_url`, `resolved`, optional `false_positive`, optional `resolved_at`, optional `resolved_by_user_id` (foreign key to `USERS`), optional `comment` |
+| `INCIDENT_RECIPIENTS` | `id` (primary key), `incident_id` (foreign key), `user_id` (foreign key to `USERS`), `notification_type`, optional `latency_priority` (integer; defaults to highest priority when unspecified) |
+| `INCIDENT_ALERTS` | `id` (primary key), `incident_id` (foreign key), `issued_at` |
 
 The model marks identifiers as primary keys and identifies the stated foreign
-keys. It does not define nullability beyond the optional incident URL, comment,
-and `false_positive` evaluation flag, uniqueness constraints, deletion behavior,
-indexes, or concrete database types and precision.
+keys. The incident URL, comment, and `false_positive` evaluation flag are
+optional; resolution fields are absent while unresolved and required when
+resolved, as specified in §4.3. Other nullability, uniqueness constraints,
+deletion behavior, indexes, and concrete database types and precision are not
+defined.
 
 Note: `false_positive` is intended as a model-evaluation flag to support DNN
 performance analysis and should be interpreted as a post-review quality metric,
@@ -148,20 +165,25 @@ Availability, retention, privacy, encryption, audit logging, and scaling targets
 are not specified by the supplied domain overview or data model and require
 separate requirements.
 
-## 7. Model questions to resolve
+## 7. Model decisions and remaining questions
 
-1. **Stream-to-incident cardinality:** `INCIDENTS.video_stream_id` suggests
-   each incident belongs to one stream, while the Mermaid relationship is
-   drawn as many-to-many. Confirm whether an incident can involve multiple
-   streams; then align the relationship and foreign-key design.
-2. **Recipient-to-alert linkage:** `INCIDENT_RECIPIENTS` has an
-   `incident_id`, while the diagram relates recipients to alerts and
-   `INCIDENT_ALERTS` has only a `video_stream_id`. Define how an alert identifies
-   its incident and recipients, and whether recipients represent people,
-   endpoints, or notification preferences.
-3. **Stream recipients:** The diagram also relates streams to incident
-   recipients, but the recipient entity has no stream key. Confirm whether this
-   relationship is intended and how it should be represented.
+1. **Stream-to-incident cardinality — decided:** Each incident belongs to
+   exactly one video stream; a stream may have zero or many incidents (1:N).
+   `INCIDENTS.video_stream_id` represents this relationship.
+2. **Resolution and alert relationships — decided:** A resolved incident has
+   exactly one resolving user with `can_resolve_incident`; a user may resolve
+   zero or many incidents (user-to-incidents 1:N, with zero resolvers while an
+   incident is unresolved). Each alert belongs to exactly one incident, and an
+   incident may have zero or many alerts (1:N). Its stream is determined by
+   that    incident. Every alert is associated with all recipients of its incident,
+   making alert-to-recipient conceptually M:N through the incident. This
+   association is derived, not stored directly, because the model does not
+   record per-recipient delivery attempts.
+3. **Recipients — decided:** A recipient is a user selected to receive
+   notifications about an incident. Each recipient record refers to exactly
+   one incident and exactly one user. An incident may have zero or many
+   recipient records, and a user may appear in zero or many recipient records.
+   The recipient-to-incident and recipient-to-user relationships are each 1:N.
 4. **Permission assignment:** Confirm whether a user has exactly one role, as
    the singular `role_id` suggests, and whether organization boundaries scope
    access to streams and incidents.
@@ -170,6 +192,3 @@ separate requirements.
    latency-priority scale and its numeric ordering.
 6. **Required values and constraints:** Define constraints for names, tags,
    stream dimensions, timestamps, confidence range, and unique records.
-7. **Resolution audit constraints:** The model includes `resolved_at` and
-   `resolved_by_user_id`; define and enforce their nullability so both are
-   absent while unresolved and populated when resolved.

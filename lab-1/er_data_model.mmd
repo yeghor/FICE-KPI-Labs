@@ -48,13 +48,14 @@ erDiagram
     INCIDENT_RECIPIENTS {
         int id PK
         int incident_id FK
+        int user_id FK
         string notification_type
         int? latency_priority
     }
 
     INCIDENT_ALERTS {
         int id PK
-        int video_stream_id FK
+        int incident_id FK
         timestamp issued_at
     }
 
@@ -67,7 +68,7 @@ erDiagram
         string? additional_info_url
 
         boolean resolved
-        boolean false_positive
+        boolean? false_positive
         timestamp? resolved_at
         int? resolved_by_user_id FK
         string? comment
@@ -78,7 +79,8 @@ erDiagram
 
     VIDEO_STREAMS }o--|| LOCATIONS : belongs_to
     VIDEO_STREAMS }o--|| ORGANIZATIONS : belongs_to
-    VIDEO_STREAMS }|--o{ INCIDENTS : generates
-    VIDEO_STREAMS |o--o{ INCIDENT_RECIPIENTS : has
-    
-    INCIDENT_RECIPIENTS }o--o{ INCIDENT_ALERTS : belongs_to
+    VIDEO_STREAMS ||--o{ INCIDENTS : generates
+    USERS |o--o{ INCIDENTS : resolves
+    INCIDENTS ||--o{ INCIDENT_RECIPIENTS : has
+    USERS ||--o{ INCIDENT_RECIPIENTS : receives
+    INCIDENTS ||--o{ INCIDENT_ALERTS : alerts
