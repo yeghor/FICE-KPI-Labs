@@ -2,25 +2,6 @@
 
 Sequence diagrams for every use case in [Gherkin.md](./Gherkin.md).
 
-**Notation**
-- `actor`: a human or external system that starts or watches the flow
-- `participant`: a system component or object
-- `->>`: synchronous call; `-)`: asynchronous message; `-->>`: return
-- Activation bars: `+` / `-` on a message, or `activate` / `deactivate`
-- Combined fragments: `opt`, `alt`/`else`, `loop`, `par`/`and`
-
-**Fragment coverage**
-
-| UC | Actors | opt | alt | loop | par |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| UC-01.1 | ArgoCD | ✓ | ✓ | ✓ | ✓ |
-| UC-01.2 | Client, Recovery Worker | ✓ | ✓ | ✓ | ✓ |
-| UC-02.1 | Client | ✓ | ✓ | ✓ | ✓ |
-| UC-02.2 | Client | ✓ | ✓ | ✓ | ✓ |
-| UC-03.1 | Client | ✓ | ✓ | ✓ | ✓ |
-| UC-03.2 | Client | ✓ | ✓ | ✓ | ✓ |
-| UC-04.1 | User / Interface | ✓ | ✓ | ✓ | ✓ |
-
 ---
 
 ## Feature 01: Data-stream health
