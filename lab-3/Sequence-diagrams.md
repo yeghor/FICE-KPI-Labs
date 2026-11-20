@@ -76,7 +76,7 @@ sequenceDiagram
     participant Mon as Stream Health Monitor
     participant Runner as Data-stream Runner
     participant Src as Video Source
-    participant DB as Database (VIDEO_STREAMS)
+    participant DB as Database
 
     Note over Client,DB: New streams default to not degraded
     Client->>+UI: register stream
@@ -148,7 +148,7 @@ sequenceDiagram
     participant API as API Gateway
     participant Auth as Auth Service
     participant An as Incident Analytics Service
-    participant DB as Database (INCIDENTS)
+    participant Incidents as INCIDENTS
     participant Viz as Report Renderer
 
     Note over Client,UI: Given: a client selects a source and date range
@@ -167,11 +167,11 @@ sequenceDiagram
         else allow
             API->>+An: analyze(streamId, from, to)
             par fetch incident list
-                An->>+DB: SELECT * FROM INCIDENTS WHERE video_stream_id AND created_at BETWEEN
-                DB-->>-An: incidents
+                An->>+Incidents: findByStreamAndRange(streamId, from, to)
+                Incidents-->>-An: incidents
             and fetch aggregates
-                An->>+DB: SELECT count, avg(confidence) GROUP BY day
-                DB-->>-An: daily aggregates
+                An->>+Incidents: calculateDailyAggregates(streamId, from, to)
+                Incidents-->>-An: daily aggregates
             end
             opt no incidents in range
                 An->>An: build empty-state summary
@@ -201,9 +201,10 @@ sequenceDiagram
     participant API as API Gateway
     participant Auth as Auth Service
     participant Inc as Incident Service
-    participant DB as Database
+    participant Incidents as INCIDENTS
+    participant Streams as VIDEO_STREAMS
 
-    Note over Client,DB: Given: incidents are available
+    Note over Client,Streams: Given: incidents are available
     Client->>+UI: open "Latest incidents"
     loop auto-refresh every N seconds while the view is open
         Note over Client,API: When: a client requests to view them
@@ -216,11 +217,11 @@ sequenceDiagram
         else allow
             API->>+Inc: getLatest(orgId, limit)
             par latest incidents
-                Inc->>+DB: SELECT latest INCIDENTS of orgId streams
-                DB-->>-Inc: incidents
+                Inc->>+Incidents: findLatest(orgId, limit)
+                Incidents-->>-Inc: incidents
             and stream metadata
-                Inc->>+DB: SELECT VIDEO_STREAMS, LOCATIONS of orgId
-                DB-->>-Inc: stream and location names
+                Inc->>+Streams: findLocations(orgId)
+                Streams-->>-Inc: stream and location names
             end
             Inc->>Inc: sort by confidence DESC
             opt no incidents returned
@@ -250,7 +251,7 @@ sequenceDiagram
     participant API as API Gateway
     participant Auth as Auth Service
     participant Met as Metrics Service
-    participant DB as Database (EVALUATION_METRICS_RECORDS)
+    participant Metrics as EVALUATION_METRICS_RECORDS
     participant Bus as Event Bus
 
     Note over Client,UI: Given: a client submits DNN model metrics
@@ -264,8 +265,8 @@ sequenceDiagram
     else allow
         API->>+Met: createRecords(payload, orgId)
         loop for each submitted record
-            Met->>+DB: incident exists AND belongs to orgId?
-            DB-->>-Met: true | false
+            Met->>+Metrics: validateIncident(incidentId, orgId)
+            Metrics-->>-Met: valid | invalid
             Met->>Met: validate metric in {FP, TP, TN, FN} or empty
             opt metric omitted
                 Met->>Met: metric = NULL
@@ -276,9 +277,9 @@ sequenceDiagram
             API-->>UI: 422 Unprocessable Entity
             UI-->>Client: show errors
         else all records valid
-            Note over Met,DB: When: the request is accepted
-            Met->>+DB: INSERT records (status = initial)
-            DB-->>-Met: record ids
+            Note over Met,Metrics: When: the request is accepted
+            Met->>+Metrics: createRecords(records, initialStatus)
+            Metrics-->>-Met: record ids
             par respond to client
                 Met-->>API: created records
                 API-->>UI: 201 Created
@@ -303,6 +304,7 @@ sequenceDiagram
     participant UI as Interface (WebUI / CLI / REST)
     participant API as API Gateway
     participant FT as Fine-tuning Service
+    participant Metrics as EVALUATION_METRICS_RECORDS
     participant DB as Database
     participant Orch as Job Orchestrator
     participant Trainer as Training Runner
@@ -312,8 +314,8 @@ sequenceDiagram
     Client->>+UI: request fine-tuning
     UI->>+API: POST /fine-tuning
     API->>+FT: startFineTuning(orgId)
-    FT->>+DB: SELECT EVALUATION_METRICS_RECORDS WHERE status = 'reviewed'
-    DB-->>-FT: reviewed records
+    FT->>+Metrics: findReviewed(orgId)
+    Metrics-->>-FT: reviewed records
     loop for each reviewed record
         alt metric = TP or FN
             FT->>FT: label = fight
