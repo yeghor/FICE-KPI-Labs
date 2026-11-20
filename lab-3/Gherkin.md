@@ -21,7 +21,8 @@ Scenarios based on [EARS.md](./EARS.md) and [User-stories.md](./User-stories.md)
 ### **Scenario UC-02.1: Analyze incidents by source and date range** (US-03, REQ-03)
 **Given** a client selects a source and date range<br>
 **When** they request an incident analysis<br>
-**Then** the system presents matching incidents in a readable, clear format
+**Then** the system presents matching incidents in a readable, clear format<br>
+**Or** the system rejects an invalid date range without querying incidents
 
 ### **Scenario UC-02.2: Review the latest incidents** (US-04, REQ-07)
 **Given** incidents are available<br>
