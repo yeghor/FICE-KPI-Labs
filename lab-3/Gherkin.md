@@ -40,7 +40,8 @@ Scenarios based on [EARS.md](./EARS.md) and [User-stories.md](./User-stories.md)
 ### **Scenario UC-03.2: Fine-tune from reviewed evaluation metrics** (US-06, REQ-05)
 **Given** reviewed evaluation records are stored with an optional `FP`, `TP`, `TN`, or `FN` metric<br>
 **When** a client requests fine-tuning<br>
-**Then** the system starts a runner that trains only on instances with a determinable, correct label
+**Then** the system starts a runner that trains only on instances with a determinable, correct label<br>
+**Or** the system returns 409 Conflict and does not start a runner when no reviewed record has a determinable label
 ## **Feature 04: Organization data privacy**
 
 ### **Scenario UC-04.1: Restrict access to organization-owned data** (US-07, REQ-06)
