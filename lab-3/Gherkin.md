@@ -22,7 +22,8 @@ Scenarios based on [EARS.md](./EARS.md) and [User-stories.md](./User-stories.md)
 **Given** a client selects a source and date range<br>
 **When** they request an incident analysis<br>
 **Then** the system presents matching incidents in a readable, clear format<br>
-**Or** the system rejects an invalid date range without querying incidents
+**Or** the system rejects an invalid date range without querying incidents<br>
+**Or** the system returns 403 Forbidden without disclosing incidents owned by another organization
 
 ### **Scenario UC-02.2: Review the latest incidents** (US-04, REQ-07)
 **Given** incidents are available<br>
